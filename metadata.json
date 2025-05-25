@@ -1,5 +1,6 @@
 {
   "name": "Fourier Transform Explorer",
   "description": "An interactive web application for visualizing and learning about Fourier Transforms, and applying them to CSV data.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [],
+  "prompt": ""
 }

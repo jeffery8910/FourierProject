@@ -1,4 +1,5 @@
 
+
 import React, { useState, useCallback, useMemo } from 'react';
 import { parseCSV, CSVParseResult } from '../services/csvParser'; // Keep for file upload
 import { fft, getMagnitudes, padSignalToPowerOfTwo } from '../services/fft';
@@ -442,106 +443,115 @@ export const CSVProcessor: React.FC = () => {
 
       <Card title="如何使用網格輸入數據 (逐步指南)">
         <div className="text-slate-300 space-y-4 leading-relaxed">
-            <p>您可以像使用試算表（例如 Excel 或 Google Sheets）一樣，直接在網站上輸入數據並進行傅立葉轉換分析。以下是如何操作：</p>
+            <p>您可以像操作電子試算表一樣，直接在這個頁面上建立資料表格，然後讓工具幫您分析其中特定欄位的頻率特性。以下是操作步驟：</p>
             
             <div>
-                <h4 className="font-semibold text-xl text-sky-400 mb-2">第 1 步：準備您的數據網格</h4>
+                <h4 className="font-semibold text-xl text-sky-400 mb-2">第 1 步：打造您的數據表格</h4>
                 <ul className="list-disc list-inside space-y-2 pl-4">
-                    <li><strong>調整網格大小：</strong>
+                    <li><strong>調整表格大小：</strong>
                         <ul className="list-circle list-inside pl-4 mt-1 space-y-1">
-                            <li>使用「增加行」/「移除最後一行」按鈕來調整數據的行數。</li>
-                            <li>使用「增加欄」/「移除最後一欄」按鈕來調整數據的欄數（即特徵數量）。</li>
+                            <li>點擊「<span className="font-semibold text-teal-300">增加行</span>」或「<span className="font-semibold text-teal-300">移除最後一行</span>」按鈕來決定您的表格需要多少行數據。</li>
+                            <li>點擊「<span className="font-semibold text-teal-300">增加欄</span>」或「<span className="font-semibold text-teal-300">移除最後一欄</span>」按鈕來決定您的表格需要多少欄資料（例如：時間、溫度、訊號值等）。</li>
                         </ul>
                     </li>
-                    <li><strong>輸入欄位名稱 (標頭)：</strong>
+                    <li><strong>設定欄位名稱 (標頭)：</strong>
                         <ul className="list-circle list-inside pl-4 mt-1 space-y-1">
-                            <li>確保「第一行包含標頭」核取方塊已勾選（這是預設狀態）。</li>
-                            <li>在網格的第一行中，為您的每一欄數據輸入一個描述性的名稱。例如：「時間」、「溫度」、「電壓」等。</li>
-                            <li><strong className="text-amber-400">重要：</strong>標頭名稱必須是唯一的，且不能為空。</li>
-                            <li>儲存格中會有提示，例如「標頭 1 (例如: 時間 (秒))」，引導您輸入。</li>
+                            <li>請確認「<span className="font-semibold text-teal-300">第一行包含標頭</span>」這個選項是勾選的（這通常是預設狀態）。</li>
+                            <li>接著，在表格的<strong className="text-amber-300">第一行</strong>，為每一欄輸入一個簡短且清楚的名稱。例如：「時間(秒)」、「電壓(V)」、「樣本編號」。</li>
+                            <li><strong className="text-red-400">非常重要：</strong>每個欄位名稱都必須是<strong className="text-red-400">獨一無二</strong>的，而且<strong className="text-red-400">不可以空白</strong>。欄位名稱如果重複或空白，工具會無法正確辨識。</li>
+                            <li>表格的儲存格內會有一些提示文字（例如「標頭 1 (例如: 時間 (秒))」）來引導您。</li>
                         </ul>
                     </li>
-                    <li><strong>輸入您的數據點：</strong>
+                    <li><strong>填入您的數據：</strong>
                         <ul className="list-circle list-inside pl-4 mt-1 space-y-1">
-                            <li>從網格的第二行開始，輸入您的實際數據。每一行代表一個時間點或一個樣本，每一欄對應您設定的標頭。</li>
-                            <li><strong className="text-amber-400">重要：</strong>您打算進行傅立葉轉換分析的欄位（例如「訊號值」）<strong className="text-red-400">必須包含數值數據</strong> (例如 1.23, -5, 100)。非數值內容（如文字）在該欄的 FFT 計算中會被忽略。</li>
-                            <li>儲存格中會有提示，例如「數據 (例如: 0.10)」，引導您輸入。</li>
+                            <li>從表格的<strong className="text-amber-300">第二行開始</strong>，依照您設定的欄位名稱，逐格填入您的實際數據。每一橫列代表一個時間點或一個樣本的完整記錄。</li>
+                            <li><strong className="text-red-400">關鍵注意：</strong>如果您希望對某一欄（例如「電壓(V)」）進行傅立葉轉換分析，那麼這一欄<strong className="text-red-400">務必只能包含數字</strong> (例如：1.23, -5, 0, 100.5)。如果包含文字或其他非數字內容，工具在計算那一欄的FFT時會將這些非數字內容忽略，可能導致結果不如預期或沒有結果。</li>
+                            <li>數據儲存格內也會有提示文字（例如「數據 (例如: 0.10)」）來引導您。</li>
                         </ul>
                     </li>
                 </ul>
             </div>
 
             <div>
-                <h4 className="font-semibold text-xl text-sky-400 mb-2">第 2 步：處理網格數據</h4>
+                <h4 className="font-semibold text-xl text-sky-400 mb-2">第 2 步：讓工具讀取您的表格數據</h4>
                 <ul className="list-disc list-inside space-y-2 pl-4">
-                    <li>完成數據輸入後，點擊「處理網格數據」按鈕。</li>
-                    <li>系統會讀取您在網格中輸入的標頭和數據。</li>
+                    <li>當您確認表格內容都輸入正確後，請點擊「<span className="font-semibold text-teal-300">處理網格數據</span>」按鈕。</li>
+                    <li>工具會開始讀取並理解您在表格中輸入的所有欄位名稱和數據。</li>
                 </ul>
             </div>
 
             <div>
-                <h4 className="font-semibold text-xl text-sky-400 mb-2">第 3 步：設定分析參數並查看結果</h4>
+                <h4 className="font-semibold text-xl text-sky-400 mb-2">第 3 步：選擇分析目標並設定關鍵參數</h4>
                 <ul className="list-disc list-inside space-y-2 pl-4">
-                    <li><strong>選取分析欄位：</strong>
+                    <li><strong>選擇要分析的欄位：</strong>
                         <ul className="list-circle list-inside pl-4 mt-1 space-y-1">
-                           <li>在「設定與狀態」區塊中，從「選取用於 FFT 的數據欄位」下拉選單中，選擇您想要進行傅立葉轉換分析的欄位（它應該是包含數值的欄位）。</li>
+                           <li>在「設定與狀態」區塊中，找到「<span className="font-semibold text-teal-300">選取用於 FFT 的數據欄位</span>」下拉選單。</li>
+                           <li>從中選擇您想要進行傅立葉轉換分析的那一欄（記得，這一欄必須是充滿數字的！）。</li>
                         </ul>
                     </li>
-                    <li><strong>設定取樣率 (Fs)：</strong>
+                    <li><strong>設定重要的「取樣率 (Fs)」：</strong>
                         <ul className="list-circle list-inside pl-4 mt-1 space-y-1">
-                            <li>輸入您數據的「假設取樣率 (Fs)」。這是非常重要的一步，因為它決定了頻譜圖中頻率軸的正確性。</li>
-                            <li>取樣率是指每單位時間（通常是秒）收集多少個數據點。例如，如果您的數據是每 0.01 秒記錄一次，那麼取樣率就是 1 / 0.01 = 100 Hz。</li>
+                            <li>這是進行準確頻率分析的<strong className="text-amber-300">核心參數</strong>。請輸入您數據的「<span className="font-semibold text-teal-300">假設取樣率 (Fs)</span>」，單位是赫茲 (Hz)。</li>
+                            <li>「取樣率」代表您的數據是<strong className="text-amber-300">多快記錄一次</strong>。例如：
+                                <ul className="list-disc list-inside pl-6 mt-1">
+                                    <li>如果您的數據是每 0.01 秒記錄一筆，那麼取樣率就是 1 / 0.01 = 100 Hz。</li>
+                                    <li>如果您的數據是每毫秒 (0.001 秒) 記錄一筆，取樣率就是 1 / 0.001 = 1000 Hz。</li>
+                                </ul>
+                            </li>
+                            <li><strong className="text-red-400">如果您不確定或設定錯誤，頻譜圖上的頻率軸將不具備實際意義。</strong></li>
                         </ul>
                     </li>
-                    <li><strong>查看圖表：</strong>
+                    <li><strong>檢視分析圖表：</strong>
                         <ul className="list-circle list-inside pl-4 mt-1 space-y-1">
-                            <li>一旦設定完成且選定欄位包含有效數值，下方將顯示兩個圖表：</li>
-                            <li><strong>時域數據圖：</strong>顯示您原始數據隨時間（或樣本索引）的變化。</li>
-                            <li><strong>頻域圖 (頻譜)：</strong>顯示經過傅立葉轉換後，數據中包含的各種頻率成分及其強度。</li>
+                            <li>一旦您完成以上設定，並且選擇的欄位確實包含有效的數值數據，下方就會出現兩個圖表：</li>
+                            <li><strong>時域數據圖：</strong>直接顯示您所選欄位的原始數據數值，橫軸通常是樣本點的順序。</li>
+                            <li><strong>頻域圖 (頻譜)：</strong>這是傅立葉轉換的結果，顯示您的數據中包含了哪些頻率成分，以及各個頻率成分的強度。</li>
                         </ul>
                     </li>
                 </ul>
             </div>
             
             <div>
-                <h4 className="font-semibold text-xl text-sky-400 mb-2">範例網格 (已勾選「第一行包含標頭」)</h4>
-                 <p className="mb-2">假設我們要分析一個隨時間變化的訊號：</p>
+                <h4 className="font-semibold text-xl text-sky-400 mb-2">範例表格說明 (假設已勾選「第一行包含標頭」)</h4>
+                 <p className="mb-2">假設我們記錄了某個感測器在不同時間點的讀數，以及當時的狀態：</p>
                 <div className="overflow-x-auto p-1 bg-slate-700 rounded max-w-md">
                     <table className="text-sm border-collapse border border-slate-600">
                         <thead>
                             <tr className="bg-slate-750">
-                                <th className="border border-slate-600 px-2 py-1 font-semibold text-sky-300">時間 (秒)</th>
-                                <th className="border border-slate-600 px-2 py-1 font-semibold text-sky-300">訊號強度</th>
-                                <th className="border border-slate-600 px-2 py-1 font-semibold text-sky-300">註解</th>
+                                <th className="border border-slate-600 px-2 py-1 font-semibold text-sky-300">時間戳(秒)</th>
+                                <th className="border border-slate-600 px-2 py-1 font-semibold text-sky-300">感測器讀數</th>
+                                <th className="border border-slate-600 px-2 py-1 font-semibold text-sky-300">狀態描述</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td className="border border-slate-600 px-2 py-1">0.0</td>
-                                <td className="border border-slate-600 px-2 py-1">1.5</td>
-                                <td className="border border-slate-600 px-2 py-1">開始</td>
+                                <td className="border border-slate-600 px-2 py-1">5.2</td>
+                                <td className="border border-slate-600 px-2 py-1">運作正常</td>
                             </tr>
                             <tr>
                                 <td className="border border-slate-600 px-2 py-1">0.1</td>
-                                <td className="border border-slate-600 px-2 py-1">1.7</td>
-                                <td className="border border-slate-600 px-2 py-1">正常</td>
+                                <td className="border border-slate-600 px-2 py-1">5.5</td>
+                                <td className="border border-slate-600 px-2 py-1">輕微波動</td>
                             </tr>
                              <tr>
                                 <td className="border border-slate-600 px-2 py-1">0.2</td>
-                                <td className="border border-slate-600 px-2 py-1">1.2</td>
-                                <td className="border border-slate-600 px-2 py-1">波動</td>
+                                <td className="border border-slate-600 px-2 py-1">4.8</td>
+                                <td className="border border-slate-600 px-2 py-1">校準中</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
                 <p className="mt-2">在這個範例中：</p>
                 <ul className="list-disc list-inside pl-4 mt-1 space-y-1">
-                    <li>「時間 (秒)」，「訊號強度」，「註解」是標頭。</li>
-                    <li>如果我們想分析訊號強度隨頻率的變化，我們會在下拉選單中選擇「訊號強度」進行 FFT。</li>
-                    <li>「註解」欄位因為是文字，所以不適合進行 FFT。</li>
+                    <li>「時間戳(秒)」、「感測器讀數」、「狀態描述」是我們的欄位名稱（標頭）。</li>
+                    <li>如果我們想分析「感測器讀數」隨頻率的變化特性，我們就會在下拉選單中選擇「感測器讀數」這一欄進行 FFT 分析。</li>
+                    <li>「時間戳(秒)」這一欄雖然是數字，但它代表的是時間軸，通常不直接作為FFT的輸入信號（除非您的取樣是非均勻的，但本工具假設是均勻取樣）。</li>
+                    {/* Fix: Changed 'class' to 'className' in the strong tag below */}
+                    <li>「狀態描述」這一欄因為包含文字，所以<strong className="text-red-400">不適合</strong>進行 FFT 分析。</li>
                 </ul>
             </div>
-            <p className="mt-4">如果您遇到問題，請檢查錯誤訊息，並確保您的數據格式和設定正確無誤。</p>
+            <p className="mt-4">如果您在操作過程中遇到任何提示錯誤，請仔細閱讀錯誤訊息，並回頭檢查您的表格內容、欄位名稱以及各項設定是否都符合要求。</p>
         </div>
       </Card>
 

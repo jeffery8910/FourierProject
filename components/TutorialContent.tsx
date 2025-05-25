@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card } from './common/Card';
 
@@ -22,7 +23,7 @@ export const TutorialContent: React.FC = () => {
       </TutorialSection>
 
       <TutorialSection title="核心概念">
-        <ul className="list-disc list-inside space-y-2">
+        <ul className="list-disc list-inside space-y-3">
           <li>
             <strong>時域 (Time Domain):</strong> 這是我們通常感知信號的方式，例如觀察聲波的形狀隨時間變化。X 軸是時間，Y 軸是振幅。
           </li>
@@ -40,6 +41,23 @@ export const TutorialContent: React.FC = () => {
           </li>
           <li>
             <strong>相位 (Phase):</strong> 波在其週期中的起始位置。它影響波如何組合。
+          </li>
+          <li>
+            <strong>取樣率 (Sampling Rate, Fs):</strong> 
+            想像您在為一段快速變化的事件拍照。取樣率就像是您每秒鐘按快門的次數。在數位信號處理中，它指的是每秒從連續信號（如聲音或感測器讀數）中擷取多少個數據點（樣本）。單位通常是赫茲 (Hz)。
+            <ul className="list-circle list-inside pl-4 mt-2 space-y-1">
+                <li><strong>重要性：</strong>取樣率必須至少是被分析信號最高頻率的兩倍（這就是著名的「奈奎斯特-香農取樣定理」），才能避免資訊失真（稱為「混疊」或「Alias」）。如果取樣率不夠高，高頻信號可能會被錯誤地解讀為較低的頻率。</li>
+                <li><strong>影響：</strong>它直接決定了您能分析到的最高頻率（即奈奎斯特頻率 = Fs / 2）。越高的取樣率能捕捉到越高頻的細節，但同時也會產生更多的數據需要處理。</li>
+            </ul>
+          </li>
+          <li>
+            <strong>取樣點數 (Number of Samples, N):</strong> 
+            這是您用於<strong className="text-amber-300">一次傅立葉轉換分析</strong>的總數據點數量。
+            <ul className="list-circle list-inside pl-4 mt-2 space-y-1">
+                <li><strong>總分析時長：</strong>取樣點數 (N) 和取樣率 (Fs) 共同決定了您分析的信號片段的總時長（時長 = N / Fs 秒）。例如，如果 N = 512 點，Fs = 1000 Hz，那麼分析的總時長就是 512 / 1000 = 0.512 秒。</li>
+                <li><strong>頻率解析度：</strong>N 越大，頻譜圖中各個頻率點之間的「間隔」就越小，意味著您可以更精細地區分兩個相近的頻率。這個頻率間隔（或稱頻率解析度）約為 Fs / N。例如，Fs = 1000 Hz, N = 512，則頻率解析度約為 1000/512 ≈ 1.95 Hz。</li>
+                <li><strong>計算效率：</strong>許多 FFT 演算法（包括本工具使用的基本版本）在 N 是 2 的次方時（例如 64, 128, 256, 512, 1024）計算效率最高。這就是為什麼您在「互動介面」中會看到這些建議值，以及在「CSV分析器」中數據會被自動填充（補零）到最接近的2的次方長度。</li>
+            </ul>
           </li>
         </ul>
          <img src="https://picsum.photos/seed/frequencyspectrumcn/600/250" alt="頻譜範例圖" className="my-4 rounded-lg shadow-md mx-auto" />
@@ -73,13 +91,19 @@ export const TutorialContent: React.FC = () => {
       
       <TutorialSection title="解讀輸出 (頻譜)">
         <p>
-          傅立葉轉換的輸出（通常顯示為「頻譜」）會在輸入信號中佔主導地位的頻率處顯示峰值。每個峰值的高度對應於該頻率分量的振幅（或強度）。
+          傅立葉轉換的輸出通常會顯示為一張「頻譜圖」。這張圖的 X 軸代表<strong>頻率</strong>，Y 軸代表該頻率分量的<strong>幅值</strong>（或強度）。
         </p>
         <p>
-          例如，如果您分析一個由 5 Hz 正弦波和 12 Hz 正弦波組成的信號（如我們的「互動介面」中所示），您會在頻譜中看到兩個主要峰值：一個在 5 Hz，另一個在 12 Hz。這些峰值的高度將與原始正弦波的振幅相關。
+          在輸入信號中佔主導地位的頻率處，頻譜圖上會出現峰值。每個峰值的高度對應於該頻率分量的相對強度。
         </p>
         <p>
-          <strong>「互動介面」</strong> 標籤頁是體驗這一點的好地方。嘗試添加不同的正弦波，看看時域和頻域圖如何變化！
+          例如，如果您分析一個由 5 Hz 正弦波和 12 Hz 正弦波組成的信號（如我們的「互動介面」中所示），您會在頻譜中看到兩個主要峰值：一個在 5 Hz 處，另一個在 12 Hz 處。這些峰值的高度將與原始正弦波的振幅相關。
+        </p>
+        <p>
+          頻譜圖的 X 軸（頻率軸）的範圍通常會從 0 Hz（直流分量）延伸到<strong>取樣率 (Fs) 的一半</strong>（這就是奈奎斯特頻率）。頻率軸上各個點的「密集程度」（即頻率解析度）則與您分析時使用的<strong>取樣點數 (N)</strong> 以及取樣率 (Fs) 有關（解析度約為 Fs/N）。
+        </p>
+        <p>
+          <strong>「互動介面」</strong> 標籤頁是體驗這一點的好地方。嘗試添加不同的正弦波，調整取樣率和取樣點數，看看時域和頻域圖如何變化！
         </p>
       </TutorialSection>
     </Card>
